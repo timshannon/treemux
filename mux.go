@@ -163,13 +163,13 @@ func (mux *Mux) match(path string) (h http.Handler, pattern string) {
 //
 // If there is no registered handler that applies to the request,
 // Handler returns a ``page not found'' handler and an empty pattern.
-func (mux *Mux) Handler(r *http.Request) (h http.Handler, pattern string) {
+func (mux *Mux) Handler(r *http.Request) (h http.Handler, pattern, root string) {
 	if r.Method != "CONNECT" {
 		if p := cleanPath(r.URL.Path); p != r.URL.Path {
 			_, pattern = mux.handler(r.Host, p)
 			url := *r.URL
 			url.Path = p
-			return http.RedirectHandler(url.String(), http.StatusMovedPermanently), pattern
+			return http.RedirectHandler(url.String(), http.StatusMovedPermanently), pattern, root
 		}
 	}
 
@@ -186,7 +186,7 @@ func (mux *Mux) Handler(r *http.Request) (h http.Handler, pattern string) {
 		}
 	}
 
-	return h, pattern
+	return h, pattern, root
 }
 
 // handler is the main implementation of Handler.
@@ -220,7 +220,7 @@ func (mux *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h, _ := mux.Handler(r)
+	h, _, _ := mux.Handler(r)
 	h.ServeHTTP(w, r)
 }
 
