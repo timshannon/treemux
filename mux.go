@@ -169,6 +169,7 @@ func (mux *Mux) Handler(r *http.Request) (h http.Handler, pattern, root string) 
 			_, pattern = mux.handler(r.Host, p)
 			url := *r.URL
 			url.Path = p
+
 			return http.RedirectHandler(url.String(), http.StatusMovedPermanently), pattern, root
 		}
 	}
